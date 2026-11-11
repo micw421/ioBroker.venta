@@ -1,0 +1,24 @@
+{
+  "type": "panel",
+  "items": {
+    "host": {
+      "type": "text",
+      "label": "Venta IP address or hostname",
+      "newLine": true
+    },
+    "pollInterval": {
+      "type": "number",
+      "label": "Polling interval (seconds)",
+      "min": 10,
+      "max": 3600,
+      "newLine": true
+    },
+    "timeout": {
+      "type": "number",
+      "label": "HTTP timeout (milliseconds)",
+      "min": 500,
+      "max": 30000,
+      "newLine": true
+    }
+  }
+}
