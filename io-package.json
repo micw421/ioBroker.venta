@@ -1,0 +1,68 @@
+{
+  "common": {
+    "name": "venta",
+    "version": "0.0.1",
+    "titleLang": {
+      "en": "Venta air humidifier",
+      "de": "Venta Luftwäscher"
+    },
+    "desc": {
+      "en": "Local API integration for Venta air humidifiers",
+      "de": "Lokale API-Anbindung für Venta-Luftwäscher"
+    },
+    "authors": [
+      "micw421"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "type": "climate-control",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "enabled": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "messagebox": false,
+    "loglevel": "info",
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.0"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.0.0"
+      }
+    ]
+  },
+  "native": {
+    "host": "",
+    "pollInterval": 60,
+    "timeout": 2000
+  },
+  "objects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "name": "Connected to Venta",
+        "type": "boolean",
+        "role": "indicator.connected",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
+}
