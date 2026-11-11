@@ -122,14 +122,28 @@ class Venta extends utils.Adapter {
         if (!['Power', 'FanSpeed', 'Automatic', 'TargetHum'].includes(key)) return;
         try {
             const current = await this.request();
-            const action = { ...current.Action };
-            if (key === 'Power' || key === 'Automatic') {
-                action[key] = state.val ? 1 : 0;
+            let command: Record<string, unknown>;
+            if (key === 'Power') {
+                command = {
+                    Power: state.val ? 1 : 0,
+                    FanSpeed: current.Action.FanSpeed,
+                    SleepMode: 0,
+                    Automatic: current.Action.Automatic,
+                };
+            } else if (key === 'FanSpeed') {
+                if (typeof state.val !== 'number' || !Number.isInteger(state.val) || state.val < 0) {
+                    throw new Error('Expected non-negative integer fan speed');
+                }
+                command = { Power: 1, FanSpeed: state.val, Automatic: 0 };
+            } else if (key === 'Automatic') {
+                command = { Power: 1, Automatic: state.val ? 1 : 0 };
             } else {
-                if (typeof state.val !== 'number' || !Number.isFinite(state.val)) throw new Error('Expected numeric control value');
-                action[key as 'FanSpeed' | 'TargetHum'] = state.val;
+                if (typeof state.val !== 'number' || !Number.isFinite(state.val) || state.val < 0 || state.val > 100) {
+                    throw new Error('Expected target humidity between 0 and 100');
+                }
+                command = { TargetHum: state.val };
             }
-            const result = await this.request({ ...action, Action: 'control' });
+            const result = await this.request({ ...command, Action: 'control' });
             await this.updateTelemetry(result);
         } catch (error) {
             this.log.warn(`Venta control failed (${key}): ${String(error)}`);
