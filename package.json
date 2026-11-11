@@ -1,0 +1,37 @@
+{
+  "name": "iobroker.venta",
+  "version": "0.0.1",
+  "description": "Local API adapter for Venta air humidifiers",
+  "author": "micw421",
+  "license": "MIT",
+  "homepage": "https://github.com/micw421/ioBroker.venta",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/micw421/ioBroker.venta.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "build/main.js",
+  "files": [
+    "admin/",
+    "build/",
+    "io-package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.4.3"
+  },
+  "devDependencies": {
+    "@iobroker/types": "^7.2.2",
+    "@tsconfig/node22": "^22.0.6",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  }
+}
