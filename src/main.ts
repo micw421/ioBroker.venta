@@ -20,7 +20,7 @@ class Venta extends utils.Adapter {
         ['control.FanSpeed', 'Fan speed', 'number', true, 'level.speed'],
         ['control.Automatic', 'Automatic mode', 'boolean', true, 'switch.mode.auto'],
         ['control.TargetHum', 'Target humidity', 'number', true, 'level.humidity', '%'],
-        ['control.SleepMode', 'Sleep mode', 'number', false, 'value'],
+        ['control.SleepMode', 'Sleep mode', 'boolean', true, 'switch.mode'],
         ['control.BaLi', 'BaLi', 'number', false, 'value'],
         ['measurements.Temperature', 'Temperature', 'number', false, 'value.temperature', '°C'],
         ['measurements.Humidity', 'Humidity', 'number', false, 'value.humidity', '%'],
@@ -50,7 +50,7 @@ class Venta extends utils.Adapter {
             type: 'state', common: { name: 'Connected to Venta', type: 'boolean', role: 'indicator.connected', read: true, write: false, def: false }, native: {},
         });
         for (const [id, name, type, write, role, unit] of this.definitions) {
-            await this.setObjectNotExistsAsync(id, {
+            await this.extendObjectAsync(id, {
                 type: 'state',
                 common: { name, type: type as 'boolean' | 'number' | 'string', role, read: true, write, ...(unit ? { unit } : {}) },
                 native: {},
@@ -86,7 +86,7 @@ class Venta extends utils.Adapter {
             'control.FanSpeed': data.Action.FanSpeed,
             'control.Automatic': data.Action.Automatic === 1,
             'control.TargetHum': data.Action.TargetHum,
-            'control.SleepMode': data.Action.SleepMode,
+            'control.SleepMode': data.Action.SleepMode === 1,
             'control.BaLi': data.Action.BaLi,
             'measurements.Temperature': data.Measure.Temperature,
             'measurements.Humidity': data.Measure.Humidity,
@@ -119,7 +119,7 @@ class Venta extends utils.Adapter {
     private async onStateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
         if (!state || state.ack || !id.startsWith(`${this.namespace}.control.`)) return;
         const key = id.slice(this.namespace.length + '.control.'.length);
-        if (!['Power', 'FanSpeed', 'Automatic', 'TargetHum'].includes(key)) return;
+        if (!['Power', 'FanSpeed', 'Automatic', 'TargetHum', 'SleepMode'].includes(key)) return;
         try {
             const current = await this.request();
             let command: Record<string, unknown>;
@@ -137,6 +137,9 @@ class Venta extends utils.Adapter {
                 command = { Power: 1, FanSpeed: state.val, Automatic: 0 };
             } else if (key === 'Automatic') {
                 command = { Power: 1, Automatic: state.val ? 1 : 0 };
+            } else if (key === 'SleepMode') {
+                if (typeof state.val !== 'boolean') throw new Error('Expected boolean sleep mode');
+                command = { SleepMode: state.val ? 1 : 0 };
             } else {
                 if (typeof state.val !== 'number' || !Number.isFinite(state.val) || state.val < 0 || state.val > 100) {
                     throw new Error('Expected target humidity between 0 and 100');
